@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Models\TokenModel;
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class CheckLoginMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        $token = $request->route('token');
+        $checkLogin = DB::table('user_token')->where('token','=',$token)->value('userid');
+        if ($checkLogin){
+            $request->loginId = $checkLogin;
+            $request->login = 'True';
+        }else{
+            $request->login = 'False';
+        }
+        return $next($request);
+
+
+
+
+    }
+}
